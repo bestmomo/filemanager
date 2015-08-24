@@ -8,7 +8,7 @@ Add Filemanager to your composer.json file to require Filemanager :
 ```
     require : {
         "laravel/framework": "5.1.*",
-        "bestmomo/filemanager": "dev-master"
+        "bestmomo/filemanager": "1.*"
     }
 ```
 
