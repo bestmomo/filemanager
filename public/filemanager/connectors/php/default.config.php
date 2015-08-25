@@ -37,30 +37,37 @@ $folderPath = $app->basePath() . '/public/filemanager/userfiles/';
 if(!$app['auth']->check()) 
 {
   $laravelAuth = false;
-} else {
-
+} 
+else 
+{
+  // Check if user has all access
   if($app['auth']->user()->accessMediasAll())
   {
     $laravelAuth = true; 
   } 
-  elseif($app['auth']->user()->accessMediasFolder())
+  elseif(method_exists($app['auth']->user(), 'accessMediasFolder'))
   {
-    // Folder name with user name
-    $folderPath .= strtolower(strtr(utf8_decode($app['auth']->user()->name), 
-      utf8_decode('àáâãäçèéêëìíîïñòóôõöùúûüýÿÀÁÂÃÄÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝ'), 
-      'aaaaaceeeeiiiinooooouuuuyyAAAAACEEEEIIIINOOOOOUUUUY'
-    )); 
-    // Create folder if doesn't exist
-    if (!is_dir($folderPath))
+    // Check if user has access to one folder
+    if($app['auth']->user()->accessMediasFolder())
     {
-      mkdir($folderPath); 
-    }  
-    $laravelAuth = true;  
-  } 
+      // Folder name with user id
+      $folderPath .= 'user' . $app['auth']->id();
+      // Create folder if doesn't exist
+      if (!is_dir($folderPath))
+      {
+        mkdir($folderPath); 
+      }  
+      $laravelAuth = true;  
+    } 
+    else
+    {
+      $laravelAuth = false;
+    }    
+  }
   else
   {
     $laravelAuth = false;
-  }
+  } 
 }
 
 /**

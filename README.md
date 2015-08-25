@@ -48,7 +48,7 @@ public function accessMediasFolder()
     // return true for access to one folder
 }
 ```
-For this function to work each user must have a "user" name in users table. A folder with this name will be created in filemanager/userfiles folder.
+A folder with user{id} name will be created in filemanager/userfiles folder.
 
 ### Integration ###
 
