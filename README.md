@@ -19,7 +19,7 @@ Update Composer :
 
 The next required step is to add the service provider to config/app.php :
 ```
-    Bestmomo\Filemanager\ScafoldServiceProvider::class,
+    Bestmomo\Filemanager\FilemanagerServiceProvider::class,
 ```
 
 ### Publish ###
