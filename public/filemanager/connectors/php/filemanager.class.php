@@ -39,8 +39,22 @@ class Filemanager {
 		$config_default = json_decode($content, true);
 		
 		// getting user config file
-		$content = file_get_contents("../../scripts/filemanager.config.js");
+		if(isset($_REQUEST['config'])) {
+			$this->getvar('config');
+			if (file_exists("../../scripts/" . $_REQUEST['config'])) {
+				$this->__log('Loading ' . basename($this->get['config']) . ' config file.');
+				$content = file_get_contents("../../scripts/" . basename($this->get['config']));
+			} else {
+				$this->__log($this->get['config'] . ' config file does not exists.');
+				$this->error("Given config file (".basename($this->get['config']).") does not exist !");
+			}
+		}	else {
+			$content = file_get_contents("../../scripts/filemanager.config.js");
+		}
 		$config = json_decode($content, true);
+		
+		// Prevent following bug https://github.com/simogeo/Filemanager/issues/398
+		$config_default['security']['uploadRestrictions'] = array();
 		
 		if(!$config) {
 			$this->error("Error parsing the settings file! Please check your JSON syntax.");
@@ -105,6 +119,9 @@ class Filemanager {
 	// $extraconfig should be formatted as json config array.
 	public function setup($extraconfig) {
 
+		// Prevent following bug https://github.com/simogeo/Filemanager/issues/398
+		$config_default['security']['uploadRestrictions'] = array();
+		
 		$this->config = array_replace_recursive($this->config, $extraconfig);
 			
 	}
@@ -126,7 +143,8 @@ class Filemanager {
 		}
 		
 		// necessary for retrieving path when set dynamically with $fm->setFileRoot() method
-		$this->dynamic_fileroot = str_replace($_SERVER['DOCUMENT_ROOT'], '', $this->doc_root);
+		// https://github.com/simogeo/Filemanager/issues/258 @todo to explore deeper
+		$this->dynamic_fileroot = str_replace("//","/",str_replace($_SERVER['DOCUMENT_ROOT'], '', $this->doc_root));
 		$this->path_to_files = $this->doc_root;
 		$this->separator = basename($this->doc_root);
 		
@@ -1174,7 +1192,7 @@ private function is_valid_path($path) {
 	$this->__log('substr path_to_files : ' . substr(realpath($path) . DIRECTORY_SEPARATOR, 0, strlen($this->path_to_files)));
 	$this->__log('path_to_files : ' . realpath($this->path_to_files) . DIRECTORY_SEPARATOR);
 	
-	return substr(realpath($path) . DIRECTORY_SEPARATOR, 0, strlen($this->path_to_files)) == (realpath($this->path_to_files) . DIRECTORY_SEPARATOR);
+	return (substr(realpath($path) . DIRECTORY_SEPARATOR, 0, strlen(realpath($this->path_to_files))) . DIRECTORY_SEPARATOR) == (realpath($this->path_to_files) . DIRECTORY_SEPARATOR);
 	
 	
 }
@@ -1328,8 +1346,8 @@ private function get_thumbnail($path) {
 	
 	// echo $thumbnail_fullpath.'<br>';
 	
-	// if thumbnail does not exist we generate it
-	if(!file_exists($thumbnail_fullpath)) {
+	// if thumbnail does not exist we generate it or cacheThumbnail is set to false
+	if(!file_exists($thumbnail_fullpath) || $this->config['options']['cacheThumbnails'] == false) {
 		
 		// create folder if it does not exist
 		if(!file_exists(dirname($thumbnail_fullpath))) {
