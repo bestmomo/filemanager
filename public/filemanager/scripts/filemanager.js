@@ -128,10 +128,7 @@ var capabilities = config.options.capabilities || new Array('select', 'download'
 
 // Get localized messages from file 
 // through culture var or from URL
-if($.urlParam('langCode') != 0) {
-	var urlLang = $.urlParam('langCode').substring(0, 2);
-	if(file_exists ('scripts/languages/'  + urlLang + '.js')) config.options.culture = urlLang;
-}
+if($.urlParam('langCode') != 0 && file_exists ('scripts/languages/'  + $.urlParam('langCode') + '.js')) config.options.culture = $.urlParam('langCode');
 
 var lg = [];
 $.ajax({
