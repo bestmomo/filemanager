@@ -14,9 +14,10 @@ class FilemanagerServiceProvider extends ServiceProvider{
  
     public function boot()
     {
-        // Assets
+        // Assets and config
         $this->publishes([
             __DIR__.'/../public' => public_path(),
+            __DIR__.'/../config' => "config",
         ], 'public');
     }
  
