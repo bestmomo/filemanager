@@ -1207,7 +1207,7 @@ private function is_valid_path($path) {
 	$patt = array('/\\\\+/','/\/+/');
 	$repl = array('\\\\','/');
 
-	$substrpath = substr(realpath($path) . DIRECTORY_SEPARATOR, 0, strlen($this->path_to_files)) . DIRECTORY_SEPARATOR;
+	$substrpath = realpath(substr($path . DIRECTORY_SEPARATOR, 0, strlen($this->path_to_files))) . DIRECTORY_SEPARATOR;
 	$substrpath = preg_replace($patt,$repl,$substrpath); // removing double slash
 
 	$rpath = realpath($this->path_to_files)  . DIRECTORY_SEPARATOR;
